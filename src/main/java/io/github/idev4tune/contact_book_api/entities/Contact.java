@@ -1,11 +1,13 @@
 package io.github.idev4tune.contact_book_api.entities;
 
+import lombok.Builder;
 import lombok.Data;
 
 import javax.persistence.*;
 
 @Entity
 @Data
+@Builder
 public class Contact {
 
     @Id
