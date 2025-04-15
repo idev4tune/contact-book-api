@@ -15,7 +15,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.net.URI;
 
 @RestController
-@RequestMapping(value = "/api/v1/contact")
+@RequestMapping(value = "/api/v1/contacts")
 @RequiredArgsConstructor
 public class ContactController {
 
@@ -29,6 +29,6 @@ public class ContactController {
                 .path("/{id}")
                 .buildAndExpand(contactDto.getId())
                 .toUri();
-        return ResponseEntity.created(uri).build();
+        return ResponseEntity.created(uri).body(contactDto);
     }
 }

@@ -2,10 +2,14 @@ package io.github.idev4tune.contact_book_api.entities.dto;
 
 import io.github.idev4tune.contact_book_api.entities.Contact;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class ContactDto {
 
     private Long id;
