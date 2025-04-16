@@ -10,9 +10,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.servlet.view.json.MappingJackson2JsonView;
 
@@ -26,16 +29,20 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExtendWith(MockitoExtension.class)
 public class ContactControllerTest {
 
-    private static final String URL = "/api/v1/contacts";
+    private static final String URN = "/api/v1/contacts";
 
-    private Contact contact = Contact.builder()
+    private final Contact contact = Contact.builder()
             .id(1L)
             .name("Bruno")
             .email("bruno@idev4tune.com")
             .favorite(true)
             .build();
 
-    private ContactDto contactDto = ContactDto.fromContact(contact);
+    private final ContactDto contactDto = ContactDto.fromContact(contact);
+
+    private Page<ContactDto> contacts;
+
+    private final PageRequest pageRequest = PageRequest.of(0, 20);
 
     private MockMvc mockMvc;
 
@@ -59,12 +66,11 @@ public class ContactControllerTest {
 
         when(contactService.save(contact)).thenReturn(contactDto);
 
-        mockMvc.perform(post(URL)
+        mockMvc.perform(post(URN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJsonString(contact)))
                 .andExpect(status().isCreated());
     }
-
 
     @Test
     @DisplayName("(2) Must return a new ContactDto object")
@@ -77,12 +83,23 @@ public class ContactControllerTest {
 
         when(contactService.save(contact)).thenReturn(contactDto);
 
-        mockMvc.perform(post(URL)
+        mockMvc.perform(post(URN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJsonString(contact)))
                 .andExpect(jsonPath("$.id", is(id)))
                 .andExpect(jsonPath("$.name", is(name)))
                 .andExpect(jsonPath("$.email", is(email)))
                 .andExpect(jsonPath("$.favorite", is(favorite)));
+    }
+
+    @Test
+    @DisplayName("(3) Must return 200 Ok status when findAll() is called")
+    void whenFindAllMethodIsCalledThenReturnAPageOfContacts() throws Exception {
+
+        when(contactService.findAll(pageRequest)).thenReturn(contacts);
+
+        mockMvc.perform(MockMvcRequestBuilders.get(URN)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
     }
 }
